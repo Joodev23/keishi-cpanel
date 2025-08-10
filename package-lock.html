@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Lihat Data User</title>
+<style>
+  body { background: #0d0d0d; color: #fff; font-family: Arial, sans-serif; padding: 20px; }
+  h1 { color: #00c6ff; }
+  button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #0072ff; border: none; border-radius: 5px; color: white; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th, td { border: 1px solid #555; padding: 8px; text-align: left; }
+  th { background: #0072ff; }
+</style>
+</head>
+<body>
+
+<h1>Data User dari JSONBin</h1>
+<button onclick="loadData()">Lihat Semua User</button>
+<button onclick="loadAdmins()">Lihat Admin Saja</button>
+
+<table id="userTable">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Password</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+const BIN_URL = "https://stretxz.my.id/b/683162c68960c979a5a070dc/latest";
+const HEADERS = {
+  "X-Master-Key": "$2a$10$dg8zO4KIAduGn0D6/D.2Au5R7hmSBDe/23xy04btU0KYzyBv2S5AC",
+  "X-Access-Key": "$2a$10$AlR3OcsKZBUlWMP/AlWOeO.jYE11KlMeUxhrmI1GIEG8wM0l9dHg6"
+};
+
+async function fetchUsers() {
+  const res = await fetch(BIN_URL, { headers: HEADERS });
+  const data = await res.json();
+  return data.record.users || data.record || [];
+}
+
+async function loadData() {
+  const users = await fetchUsers();
+  renderTable(users);
+}
+
+async function loadAdmins() {
+  const users = await fetchUsers();
+  const admins = users.filter(u => u.role === "owner");
+  renderTable(admins);
+}
+
+function renderTable(users) {
+  const tbody = document.querySelector("#userTable tbody");
+  tbody.innerHTML = "";
+  users.forEach(u => {
+    const row = `<tr>
+      <td>${u.username}</td>
+      <td>${u.password}</td>
+      <td>${u.role}</td>
+    </tr>`;
+    tbody.insertAdjacentHTML("beforeend", row);
+  });
+}
+</script>
+
+</body>
+</html>
