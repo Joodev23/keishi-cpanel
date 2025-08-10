@@ -7,8 +7,15 @@ export default async function handler(req, res) {
       }
     });
 
-    const json = await r.json();
-    res.status(200).json(json.record.users); // langsung kirim array users
+    const text = await r.text();
+
+    try {
+      const json = JSON.parse(text);
+      res.status(200).json(json.record.users);
+    } catch (e) {
+      // Kalau gagal parse JSON, kirim mentah buat lihat isinya
+      res.status(500).send(text);
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
